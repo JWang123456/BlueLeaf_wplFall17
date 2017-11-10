@@ -21,11 +21,11 @@ public class UserInfoService {
 	    return lu; 
 	}
 
-	public UserInfo getUser(String userID) {
+	public UserInfo getUser(String emailID) {
 		// TODO Auto-generated method stub
 		DBConnector db=new DBConnector();
 		Connection conn=db.getConnection();
-	    UserInfo uI= db.getUserInfo(conn,userID);
+	    UserInfo uI= db.getUserInfo(conn,emailID);
 	    try {
 			conn.close();
 		} catch (SQLException e) {

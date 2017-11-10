@@ -9,15 +9,23 @@ public class UserInfo {
 	String password;
 	String email;
 	int userType;
+	int phoneNum;
+	public int getPhoneNum() {
+		return phoneNum;
+	}
+	public void setPhoneNum(int phoneNum) {
+		this.phoneNum = phoneNum;
+	}
 	public UserInfo(){
 		
 	}
-	public UserInfo(long userID, String username, String password, String email, int userType) {
+	public UserInfo(long userID, String username, String password, String email, int userType,int phoneNum) {
 		this.userID = userID;
 		this.username = username;
 		this.password = password;
 		this.email = email;
 		this.userType = userType;
+		this.phoneNum=phoneNum;
 	}
 	
 	public long getUserID() {
