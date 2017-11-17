@@ -34,4 +34,16 @@ public class UserInfoService {
 	    return uI; 
 	}
 
+	public UserInfo getUserFromUserID(String userID) {
+		DBConnector db=new DBConnector();
+		Connection conn=db.getConnection();
+	    UserInfo uI= db.getUserInfoFromUserID(conn,userID);
+	    try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	    return uI;
+	}
+
 }

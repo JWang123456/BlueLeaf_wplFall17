@@ -1,8 +1,14 @@
 package blueleaf.giftregistry.model;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Category {
 	int categoryID;
 	String categoryName;
+public Category(){
+		
+	}
 	public Category(int categoryID, String categoryName) {
 		this.categoryID = categoryID;
 		this.categoryName = categoryName;

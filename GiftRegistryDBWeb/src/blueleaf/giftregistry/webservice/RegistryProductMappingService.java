@@ -21,16 +21,15 @@ import blueleaf.giftregistry.model.UserInfo;
 @Path("/registryproductmapper")
 public class RegistryProductMappingService {
 	
-	@Path("/addproduct/{registryID}")
-	@POST
+	@Path("/addproduct/{registryID}/{productID}")
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Status addProductToRegistry(@PathParam("registryID") String regID,Product p)
+	public Status addProductToRegistry(@PathParam("registryID") String regID,@PathParam("productID") String productID)
 	{
 		Status s=new Status();
 	    DBConnector db=new DBConnector();
 		Connection con=db.getConnection();
-		boolean success=db.addProductToRegistry(con,regID,p);
+		boolean success=db.addProductToRegistry(con,regID,productID);
 		try {
 			con.close();
 		} catch (SQLException e) {
@@ -45,16 +44,16 @@ public class RegistryProductMappingService {
 	}
 
 	
-	@Path("/deleteproduct/{registryID}")
-	@POST
+	@Path("/deleteproduct/{registryID}/{productID}")
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Status deleteProductFromRegistry(@PathParam("registryID") String regID,Product p)
+	public Status deleteProductFromRegistry(@PathParam("registryID") String regID,@PathParam("productID") String productID)
 	{
 		Status s=new Status();
 	    DBConnector db=new DBConnector();
 		Connection con=db.getConnection();
-		boolean success=db.deleteProductFromRegistry(con,regID,p);
+		boolean success=db.deleteProductFromRegistry(con,regID,productID);
 		try {
 			con.close();
 		} catch (SQLException e) {
@@ -80,16 +79,15 @@ public class RegistryProductMappingService {
 		return l;
 	}
 	
-	@Path("/shareprivateregistry/{buyerUserID}")
-	@POST
+	@Path("/shareprivateregistry/{registryID}/{registryOwnerID}/{buyerUserID}")
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Status deleteProductFromRegistry(@PathParam("buyerUserID") int buyerUserID,Registry r)
+	public Status shareRegistry(@PathParam("buyerUserID") int buyerUserID,@PathParam("registryID") int regID,@PathParam("registryOwnerID") int regOwnerID)
 	{
 		Status s=new Status();
 	    DBConnector db=new DBConnector();
 		Connection con=db.getConnection();
-		boolean success=db.shareRegistry(con,buyerUserID,r);
+		boolean success=db.shareRegistry(con,buyerUserID,regID,regOwnerID);
 		try {
 			con.close();
 		} catch (SQLException e) {
@@ -99,6 +97,8 @@ public class RegistryProductMappingService {
 		if(success){
 			s.setCode(100);
 			s.setMessage("SUCCESS");
+		}else{
+			s.setMessage("UNABLE TO ADD ENTRY TO DB");;
 		}
 		return s;
 	}

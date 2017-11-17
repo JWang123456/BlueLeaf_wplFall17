@@ -63,6 +63,12 @@ public class CustomerDetailsService {
 		return us.getUser(emailID);
 	}
 	
-	
+	@Path("/userID/{userID}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public UserInfo getUserFromID(@PathParam("userID") String userID) {
+		
+		return us.getUserFromUserID(userID);
+	}
 	
 }

@@ -345,14 +345,14 @@ private final static Logger LOGGER = Logger.getLogger(DBConnector.class.getName(
 		return success;
 	}
 
-	public boolean addProductToRegistry(Connection con,String regID, Product p) {
+	public boolean addProductToRegistry(Connection con,String regID, String productID) {
 		boolean status=false;
 		try
 		{  
 		String sql ="Insert into RegistryProductTable values(?,?)";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setInt(1,Integer.parseInt(regID));
-		ps.setInt(2,(int) p.getProductID());
+		ps.setInt(2,Integer.parseInt(productID));
 		int count=ps.executeUpdate();
 		if (count>0){
 			status=true;	
@@ -364,11 +364,11 @@ private final static Logger LOGGER = Logger.getLogger(DBConnector.class.getName(
       return status;
 	}
 
-	public boolean deleteProductFromRegistry(Connection con, String regID, Product p) {
+	public boolean deleteProductFromRegistry(Connection con, String regID, String productID) {
 		boolean status=false;
 		try
 		{  
-		String sql ="delete from RegistryProductTable where registryID="+regID+" and productID="+p.getProductID();
+		String sql ="delete from RegistryProductTable where registryID="+regID+" and productID="+productID;
 		PreparedStatement ps = con.prepareStatement(sql);
 		int count=ps.executeUpdate();
 		if (count>0){
@@ -416,14 +416,14 @@ private final static Logger LOGGER = Logger.getLogger(DBConnector.class.getName(
 		return lp;
 	}
 
-	public boolean shareRegistry(Connection con,int buyerUserID, Registry r) {
+	public boolean shareRegistry(Connection con,int buyerUserID,int regID, int regOwnerID) {
 		boolean status=false;
 		try
 		{  
 		String sql ="Insert into PrivateRegistryMappingTable values(?,?,?)";
 		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setInt(1,r.getUserID());
-		ps.setInt(2,r.getRegistryID());
+		ps.setInt(1,regOwnerID);
+		ps.setInt(2,regID);
 		ps.setInt(3,buyerUserID);
 		int count=ps.executeUpdate();
 		if (count>0){
@@ -458,7 +458,7 @@ private final static Logger LOGGER = Logger.getLogger(DBConnector.class.getName(
 			String query = "delete from  PrivateRegistryMappingTable where registryID="+registryID;
  			PreparedStatement ps = con.prepareStatement(query);
 			int rNum = ps.executeUpdate();
-			if(rNum>0){
+			if(rNum>=0){
 				success=true;
 			}
 		}
@@ -494,7 +494,7 @@ private final static Logger LOGGER = Logger.getLogger(DBConnector.class.getName(
                 	}
 			}
             //get all public registries
-            String sql1="select * from UserRegistryTable where registryType=1";
+            String sql1="select * from UserRegistryTable where registryType=1 and userID!="+userID;
             Statement s1 = con.createStatement();
             ResultSet rs1 = s1.executeQuery(sql1);
             while(rs1.next())
@@ -518,5 +518,93 @@ private final static Logger LOGGER = Logger.getLogger(DBConnector.class.getName(
 		e.printStackTrace();
 	}
 		return lr;
-	}	
+	}
+
+	public UserInfo getUserInfoFromUserID(Connection conn2, String userID) {
+		UserInfo u =new UserInfo();
+		try	{ //change the query to search
+			String sql = "SELECT * FROM UserInfoTable where userID='"+userID+"'";
+ 			Statement s = conn.createStatement();
+            ResultSet rs = s.executeQuery(sql);
+            int userId=0;
+        	String username="";
+        	String password="";
+        	String email="";
+        	int userType=0;
+        	int phoneNum=0;
+            if(rs.next())
+			{
+            	userId=rs.getInt("userID");
+            	username=rs.getString("userName");
+            	password=rs.getString("password");
+            	email=rs.getString("email");
+            	userType=rs.getInt("userType");
+            	phoneNum=rs.getInt("phoneNum");
+            	u=new UserInfo(userId,username,password,email,userType,phoneNum);
+			}
+	} catch(Exception e){
+		System.out.println(e);
+		e.printStackTrace();
+	}
+		return u;
+	}
+
+	public boolean assignProduct(Connection con, int regID, int productID, String buyerUserID) {
+		boolean status=false;
+		try
+		{  
+		String sql ="Insert into BuyerUserTable values(?,?,?)";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setInt(1,regID);
+		ps.setInt(2,productID);
+		ps.setString(3,buyerUserID);
+		int k=ps.executeUpdate();
+		if(k>0){
+			status=true;
+		}	
+	}catch(Exception e){
+		System.out.println("Exception occured while adding new user :"+e.getMessage());
+		  e.printStackTrace();
+	}
+      return status;
+	}
+
+	public List<Product> getAssignedProduct(Connection con, int regID, String buyerUserID) {
+		List<Product> lp=new LinkedList<Product>();
+		try	{ 
+			String sql = "select * from ProductTable inner join ProductBrandTable on brandID=brand_brandID inner join ProductCategoryTable "
+					+"on categoryID=category_categoryID inner join BuyerUserTable as b on b.productID=ProductTable.productID where BuyerUserID="+buyerUserID;
+ 			Statement s = con.createStatement();
+            ResultSet rs = s.executeQuery(sql);
+            long productID=0;
+        	String productName="";
+        	float price=0;
+        	String imageURL="";
+        	int rating=0;
+        	int certification=0;
+        	int brandID=0;
+        	int categoryID=0;
+        	String brandName="";
+        	String categoryName="";
+            while(rs.next())
+			{
+            	productID=rs.getInt("productID");
+            	productName=rs.getString("productName");
+            	price=rs.getFloat("price");
+            	imageURL=rs.getString("imageURL");
+            	rating=rs.getInt("rating");
+            	certification=rs.getInt("certification");
+            	brandID=rs.getInt("brand_brandID");
+            	categoryID=rs.getInt("category_categoryID");
+            	brandName=rs.getString("productName");
+            	categoryName=rs.getString("categoryName");
+            	Product p=new Product(productID,productName,price,imageURL,rating,certification,brandID,categoryID,brandName,categoryName);
+            	lp.add(p);
+			}
+	} catch(Exception e){
+		System.out.println(e);
+		e.printStackTrace();
+	}
+		return lp;
+	}
 }
