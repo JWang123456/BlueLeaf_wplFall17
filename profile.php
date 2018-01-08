@@ -1,0 +1,1 @@
+I am profile. <a href="editprofile.php">edit</a>
